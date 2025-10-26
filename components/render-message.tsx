@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { ChatRequestOptions, JSONValue, Message, ToolInvocation } from 'ai'
 
 import { AnswerSection } from './answer-section'
+import { ImageSection } from './image-section'
 import { ReasoningSection } from './reasoning-section'
 import RelatedQuestions from './related-questions'
 import { ToolSection } from './tool-section'
@@ -99,6 +100,13 @@ export function RenderMessage({
     return 0
   }, [reasoningAnnotation])
 
+  // Extract image annotations
+  const imageAnnotations = useMemo(() => {
+    const annotations = message.annotations as any[] | undefined
+    if (!annotations) return []
+    return annotations.filter(a => a.type === 'image' && a.data !== undefined)
+  }, [message.annotations])
+
   if (message.role === 'user') {
     return (
       <UserMessage
@@ -171,6 +179,19 @@ export function RenderMessage({
             return null
         }
       })}
+      {imageAnnotations.map((annotation, index) => (
+        <ImageSection
+          key={`${messageId}-image-${index}`}
+          base64={annotation.data.base64}
+          mediaType={annotation.data.mediaType}
+          alt={annotation.data.alt}
+          prompt={annotation.data.prompt}
+          isOpen={getIsOpen(`${messageId}-image-${index}`)}
+          onOpenChange={open =>
+            onOpenChange(`${messageId}-image-${index}`, open)
+          }
+        />
+      ))}
       {relatedQuestions && relatedQuestions.length > 0 && (
         <RelatedQuestions
           annotations={relatedQuestions as JSONValue[]}
