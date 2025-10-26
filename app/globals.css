@@ -113,3 +113,38 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Mobile-specific utilities */
+@layer utilities {
+  /* Safe area insets for notched devices */
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .pt-safe {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  
+  .pl-safe {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+  
+  .pr-safe {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  /* Smooth momentum scrolling for iOS */
+  .-webkit-overflow-scrolling-touch {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent overscroll bounce */
+  .overscroll-behavior-contain {
+    overscroll-behavior: contain;
+  }
+
+  /* Better touch interactions */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+}

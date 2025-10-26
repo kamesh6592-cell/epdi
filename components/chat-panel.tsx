@@ -115,13 +115,15 @@ export function ChatPanel({
     <div
       className={cn(
         'w-full bg-background group/form-container shrink-0',
-        messages.length > 0 ? 'sticky bottom-0 px-2 pb-4' : 'px-6'
+        messages.length > 0 
+          ? 'sticky bottom-0 px-2 sm:px-3 pb-3 sm:pb-4 pb-safe' 
+          : 'px-4 sm:px-6'
       )}
     >
       {messages.length === 0 && (
-        <div className="mb-10 flex flex-col items-center gap-4">
-          <IconLogo className="size-12 text-muted-foreground" />
-          <p className="text-center text-3xl font-semibold">
+        <div className="mb-6 sm:mb-10 flex flex-col items-center gap-3 sm:gap-4">
+          <IconLogo className="size-10 sm:size-12 text-muted-foreground" />
+          <p className="text-center text-2xl sm:text-3xl font-semibold px-4">
             How can I help you today?
           </p>
         </div>
@@ -136,20 +138,20 @@ export function ChatPanel({
             type="button"
             variant="outline"
             size="icon"
-            className="absolute -top-10 right-4 z-20 size-8 rounded-full shadow-md"
+            className="absolute -top-10 right-3 sm:right-4 z-20 size-9 sm:size-8 rounded-full shadow-md touch-manipulation"
             onClick={handleScrollToBottom}
             title="Scroll to bottom"
           >
-            <ChevronDown size={16} />
+            <ChevronDown size={18} className="sm:size-4" />
           </Button>
         )}
 
-        <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
+        <div className="relative flex flex-col w-full gap-2 bg-muted rounded-2xl sm:rounded-3xl border border-input">
           <Textarea
             ref={inputRef}
             name="input"
             rows={2}
-            maxRows={5}
+            maxRows={4}
             tabIndex={0}
             onCompositionStart={handleCompositionStart}
             onCompositionEnd={handleCompositionEnd}
@@ -157,7 +159,7 @@ export function ChatPanel({
             spellCheck={false}
             value={input}
             disabled={isLoading || isToolInvocationInProgress()}
-            className="resize-none w-full min-h-12 bg-transparent border-0 p-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            className="resize-none w-full min-h-11 sm:min-h-12 bg-transparent border-0 p-3 sm:p-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 touch-manipulation"
             onChange={e => {
               handleInputChange(e)
               setShowEmptyScreen(e.target.value.length === 0)
@@ -183,37 +185,44 @@ export function ChatPanel({
           />
 
           {/* Bottom menu area */}
-          <div className="flex items-center justify-between p-3">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between p-2 sm:p-3">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <ModelSelector models={models || []} />
               <SearchModeToggle />
               <DeepDiveToggle />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               {messages.length > 0 && (
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={handleNewChat}
-                  className="shrink-0 rounded-full group"
+                  className="shrink-0 size-9 sm:size-10 rounded-full group touch-manipulation"
                   type="button"
                   disabled={isLoading || isToolInvocationInProgress()}
                 >
-                  <MessageCirclePlus className="size-4 group-hover:rotate-12 transition-all" />
+                  <MessageCirclePlus className="size-4 sm:size-[18px] group-hover:rotate-12 transition-all" />
                 </Button>
               )}
               <Button
                 type={isLoading ? 'button' : 'submit'}
                 size={'icon'}
                 variant={'outline'}
-                className={cn(isLoading && 'animate-pulse', 'rounded-full')}
+                className={cn(
+                  isLoading && 'animate-pulse', 
+                  'rounded-full size-9 sm:size-10 touch-manipulation'
+                )}
                 disabled={
                   (input.length === 0 && !isLoading) ||
                   isToolInvocationInProgress()
                 }
                 onClick={isLoading ? stop : undefined}
               >
-                {isLoading ? <Square size={20} /> : <ArrowUp size={20} />}
+                {isLoading ? (
+                  <Square size={18} className="sm:size-5" />
+                ) : (
+                  <ArrowUp size={18} className="sm:size-5" />
+                )}
               </Button>
             </div>
           </div>

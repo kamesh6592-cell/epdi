@@ -126,16 +126,18 @@ export function ChatMessages({
       role="list"
       aria-roledescription="chat messages"
       className={cn(
-        'relative size-full pt-14',
+        'relative size-full pt-14 sm:pt-16',
+        'overscroll-behavior-contain', // Prevent pull-to-refresh on mobile
+        '-webkit-overflow-scrolling-touch', // Smooth momentum scrolling on iOS
         sections.length > 0 ? 'flex-1 overflow-y-auto' : ''
       )}
     >
-      <div className="relative mx-auto w-full max-w-3xl px-4">
+      <div className="relative mx-auto w-full max-w-3xl px-3 sm:px-4 pb-safe">
         {sections.map((section, sectionIndex) => (
           <div
             key={section.id}
             id={`section-${section.id}`}
-            className="chat-section mb-8"
+            className="chat-section mb-6 sm:mb-8"
             style={
               sectionIndex === sections.length - 1
                 ? { minHeight: 'calc(-228px + 100dvh)' }
@@ -143,7 +145,7 @@ export function ChatMessages({
             }
           >
             {/* User message */}
-            <div className="flex flex-col gap-4 mb-4">
+            <div className="flex flex-col gap-3 sm:gap-4 mb-3 sm:mb-4">
               <RenderMessage
                 message={section.userMessage}
                 messageId={section.userMessage.id}
@@ -156,9 +158,9 @@ export function ChatMessages({
                 reload={reload}
               />
               {showLoading && (
-                <div className="flex items-center gap-2">
-                  <Spinner />
-                  <Shimmer duration={1.5} className="text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 py-2">
+                  <Spinner className="size-4" />
+                  <Shimmer duration={1.5} className="text-xs sm:text-sm text-muted-foreground">
                     AI is thinking and generating response...
                   </Shimmer>
                 </div>
@@ -167,7 +169,7 @@ export function ChatMessages({
 
             {/* Assistant messages */}
             {section.assistantMessages.map(assistantMessage => (
-              <div key={assistantMessage.id} className="flex flex-col gap-4">
+              <div key={assistantMessage.id} className="flex flex-col gap-3 sm:gap-4">
                 <RenderMessage
                   message={assistantMessage}
                   messageId={assistantMessage.id}

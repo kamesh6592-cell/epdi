@@ -213,8 +213,10 @@ export function Chat({
   return (
     <div
       className={cn(
-        'relative flex h-full min-w-0 flex-1 flex-col',
-        messages.length === 0 ? 'items-center justify-center' : ''
+        'relative flex h-full min-h-0 min-w-0 flex-1 flex-col',
+        'md:h-full', // Desktop: use container height
+        messages.length === 0 ? 'items-center justify-center' : '',
+        'touch-pan-y' // Enable smooth touch scrolling
       )}
       data-testid="full-chat"
     >
