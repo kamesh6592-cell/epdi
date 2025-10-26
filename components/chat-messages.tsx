@@ -6,6 +6,8 @@ import { ChatRequestOptions, JSONValue, Message } from 'ai'
 
 import { cn } from '@/lib/utils'
 
+import { Shimmer } from '@/components/ai-elements/shimmer'
+
 import { Spinner } from './ui/spinner'
 import { RenderMessage } from './render-message'
 import { ToolSection } from './tool-section'
@@ -153,7 +155,14 @@ export function ChatMessages({
                 onUpdateMessage={onUpdateMessage}
                 reload={reload}
               />
-              {showLoading && <Spinner />}
+              {showLoading && (
+                <div className="flex items-center gap-2">
+                  <Spinner />
+                  <Shimmer duration={1.5} className="text-sm text-muted-foreground">
+                    AI is thinking and generating response...
+                  </Shimmer>
+                </div>
+              )}
             </div>
 
             {/* Assistant messages */}
