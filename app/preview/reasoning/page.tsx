@@ -7,98 +7,107 @@ import {
   ReasoningContent,
   ReasoningTrigger,
 } from '@/components/ai-elements/reasoning'
-import { Button } from '@/components/ui/button'
-
-const reasoningSteps = [
-  'Let me think about this problem step by step.',
-  '\n\nFirst, I need to understand what the user is asking for.',
-  '\n\nThey want a reasoning component that opens automatically when streaming begins and closes when streaming finishes. The component should be composable and follow existing patterns in the codebase.',
-  '\n\nThis seems like a collapsible component with state management would be the right approach.',
-].join('')
 
 export default function ReasoningPreview() {
-  const [content, setContent] = React.useState('')
-  const [isStreaming, setIsStreaming] = React.useState(false)
-  const [currentTokenIndex, setCurrentTokenIndex] = React.useState(0)
-  const [tokens, setTokens] = React.useState<string[]>([])
-
-  // Function to chunk text into fake tokens of 3-4 characters
-  const chunkIntoTokens = React.useCallback((text: string): string[] => {
-    const tokens: string[] = []
-    let i = 0
-    while (i < text.length) {
-      const chunkSize = Math.floor(Math.random() * 2) + 3 // Random size between 3-4
-      tokens.push(text.slice(i, i + chunkSize))
-      i += chunkSize
-    }
-    return tokens
-  }, [])
-
-  const startStreaming = React.useCallback(() => {
-    const tokenizedSteps = chunkIntoTokens(reasoningSteps)
-    setTokens(tokenizedSteps)
-    setContent('')
-    setCurrentTokenIndex(0)
-    setIsStreaming(true)
-  }, [chunkIntoTokens])
-
-  React.useEffect(() => {
-    if (!isStreaming || currentTokenIndex >= tokens.length) {
-      if (isStreaming && currentTokenIndex >= tokens.length) {
-        setIsStreaming(false)
-      }
-      return
-    }
-
-    const timer = setTimeout(() => {
-      setContent((prev) => prev + tokens[currentTokenIndex])
-      setCurrentTokenIndex((prev) => prev + 1)
-    }, 25) // Faster interval since we're streaming smaller chunks
-
-    return () => clearTimeout(timer)
-  }, [isStreaming, currentTokenIndex, tokens])
-
   return (
     <div className="container mx-auto max-w-4xl py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Reasoning</h1>
+        <h1 className="text-3xl font-bold mb-2">Reasoning Component</h1>
         <p className="text-muted-foreground">
-          The Reasoning component displays AI reasoning content, automatically opening during 
-          streaming and closing when finished.
+          Production-ready reasoning component for AI SDK integration.
+          Use this with your chat API that returns reasoning parts.
         </p>
       </div>
 
       <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button 
-            onClick={startStreaming} 
-            disabled={isStreaming}
-          >
-            {isStreaming ? 'Streaming...' : 'Start Streaming'}
-          </Button>
-          <span className="text-sm text-muted-foreground">
-            {isStreaming ? 'Watch the reasoning component auto-open and close' : 'Click to simulate AI reasoning'}
-          </span>
+        <div className="rounded-lg border bg-card p-6">
+          <h3 className="font-semibold mb-4">Example Usage</h3>
+          
+          {/* Example with no streaming - collapsed */}
+          <div className="mb-6">
+            <Reasoning className="w-full" isStreaming={false}>
+              <ReasoningTrigger>
+                Thought for 4 seconds
+              </ReasoningTrigger>
+              <ReasoningContent>
+                Let me think about this problem step by step.
+                
+                First, I need to understand what the user is asking for.
+                
+                They want a reasoning component that opens automatically when streaming begins 
+                and closes when streaming finishes. The component should be composable and 
+                follow existing patterns in the codebase.
+                
+                This seems like a collapsible component with state management would be the 
+                right approach.
+              </ReasoningContent>
+            </Reasoning>
+          </div>
         </div>
 
-        <div className="rounded-lg border bg-card p-6">
-          <Reasoning className="w-full" isStreaming={isStreaming}>
-            <ReasoningTrigger>
-              {isStreaming ? 'Thought for 4 seconds' : 'Reasoning'}
-            </ReasoningTrigger>
-            <ReasoningContent>
-              {content || 'Click "Start Streaming" to see the reasoning process...'}
-            </ReasoningContent>
-          </Reasoning>
+        <div className="rounded-lg border bg-card p-6 space-y-4">
+          <h3 className="font-semibold">Integration Guide</h3>
+          
+          <div className="text-sm space-y-3">
+            <div>
+              <p className="font-medium mb-1">1. In your chat component:</p>
+              <pre className="bg-muted p-3 rounded text-xs overflow-x-auto">
+{`{messages.map((message) => (
+  <Message from={message.role} key={message.id}>
+    <MessageContent>
+      {message.parts.map((part, i) => {
+        if (part.type === 'reasoning') {
+          return (
+            <Reasoning
+              key={\`\${message.id}-\${i}\`}
+              isStreaming={
+                status === 'streaming' && 
+                i === message.parts.length - 1 && 
+                message.id === messages.at(-1)?.id
+              }
+            >
+              <ReasoningTrigger />
+              <ReasoningContent>{part.text}</ReasoningContent>
+            </Reasoning>
+          );
+        }
+        return <Response key={\`\${message.id}-\${i}\`}>{part.text}</Response>;
+      })}
+    </MessageContent>
+  </Message>
+))}`}
+              </pre>
+            </div>
+
+            <div>
+              <p className="font-medium mb-1">2. In your API route (app/api/chat/route.ts):</p>
+              <pre className="bg-muted p-3 rounded text-xs overflow-x-auto">
+{`import { streamText } from 'ai';
+
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+
+  const result = streamText({
+    model: 'deepseek/deepseek-r1',
+    messages,
+  });
+
+  return result.toUIMessageStreamResponse({
+    sendReasoning: true, // Enable reasoning parts
+  });
+}`}
+              </pre>
+            </div>
+          </div>
         </div>
 
         <div className="text-sm text-muted-foreground space-y-2">
-          <p><strong>Features demonstrated:</strong></p>
+          <p><strong>Features:</strong></p>
           <ul className="list-disc list-inside space-y-1 ml-4">
-            <li>Auto-opens when streaming begins (isStreaming=true)</li>
+            <li>Auto-opens when isStreaming=true</li>
             <li>Auto-closes when streaming finishes</li>
-            <li>Pulsing animation indicator during streaming</li>
-            <li>Manual toggle available when not streaming</li>
+            <li>Pulsing blue indicator during streaming</li>
+            <li>Manual toggle when not streaming</li>
             <li>Smooth collapsible animations</li>
           </ul>
         </div>
