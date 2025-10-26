@@ -2,15 +2,19 @@
 
 import * as React from 'react'
 
-import { Check, Loader2 } from 'lucide-react'
+import { ChevronDown, Dot, type LucideIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger
+} from '@/components/ui/collapsible'
 
 interface ChainOfThoughtContextType {
-  steps: StepData[]
-  addStep: (step: Omit<StepData, 'id'>) => void
-  updateStep: (id: string, updates: Partial<StepData>) => void
-  currentStepId?: string
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
 }
 
 const ChainOfThoughtContext = React.createContext<ChainOfThoughtContextType | undefined>(
@@ -25,107 +29,148 @@ function useChainOfThought() {
   return context
 }
 
-interface StepData {
-  id: string
-  title: string
-  content?: React.ReactNode
-  status: 'pending' | 'running' | 'complete'
-}
-
 // Main ChainOfThought Component
 interface ChainOfThoughtProps extends React.ComponentProps<'div'> {
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
   children: React.ReactNode
 }
 
 export function ChainOfThought({
+  open,
+  defaultOpen = false,
+  onOpenChange,
   children,
   className,
   ...props
 }: ChainOfThoughtProps) {
-  const [steps, setSteps] = React.useState<StepData[]>([])
-  const [currentStepId, setCurrentStepId] = React.useState<string>()
-
-  const addStep = React.useCallback((stepData: Omit<StepData, 'id'>) => {
-    const id = Math.random().toString(36).substr(2, 9)
-    const step = { id, ...stepData }
-    setSteps(prev => [...prev, step])
-    if (stepData.status === 'running') {
-      setCurrentStepId(id)
+  const [internalOpen, setInternalOpen] = React.useState(defaultOpen)
+  
+  const isControlled = open !== undefined
+  const isOpen = isControlled ? open : internalOpen
+  const setIsOpen = React.useCallback((newOpen: boolean) => {
+    if (!isControlled) {
+      setInternalOpen(newOpen)
     }
-  }, [])
-
-  const updateStep = React.useCallback((id: string, updates: Partial<StepData>) => {
-    setSteps(prev => prev.map(step => 
-      step.id === id ? { ...step, ...updates } : step
-    ))
-    if (updates.status === 'running') {
-      setCurrentStepId(id)
-    }
-  }, [])
+    onOpenChange?.(newOpen)
+  }, [isControlled, onOpenChange])
 
   const contextValue = React.useMemo(() => ({
-    steps,
-    addStep,
-    updateStep,
-    currentStepId
-  }), [steps, addStep, updateStep, currentStepId])
+    isOpen,
+    setIsOpen
+  }), [isOpen, setIsOpen])
 
   return (
     <ChainOfThoughtContext.Provider value={contextValue}>
-      <div className={cn('w-full space-y-3', className)} {...props}>
+      <Collapsible
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        className={cn('w-full', className)}
+        {...props}
+      >
         {children}
-        {steps.length > 0 && (
-          <div className="space-y-2">
-            {steps.map((step) => (
-              <ChainOfThoughtStep
-                key={step.id}
-                title={step.title}
-                status={step.status}
-                isActive={step.id === currentStepId}
-              >
-                {step.content}
-              </ChainOfThoughtStep>
-            ))}
-          </div>
-        )}
-      </div>
+      </Collapsible>
     </ChainOfThoughtContext.Provider>
+  )
+}
+
+// ChainOfThought Header Component
+interface ChainOfThoughtHeaderProps extends React.ComponentProps<typeof CollapsibleTrigger> {
+  children?: React.ReactNode
+}
+
+export function ChainOfThoughtHeader({
+  children = 'Chain of Thought',
+  className,
+  ...props
+}: ChainOfThoughtHeaderProps) {
+  const { isOpen } = useChainOfThought()
+
+  return (
+    <CollapsibleTrigger
+      className={cn(
+        'flex w-full items-center justify-between rounded-lg border bg-card p-3 text-left text-sm font-medium transition-colors',
+        'hover:bg-accent hover:text-accent-foreground',
+        'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+        'data-[state=open]:bg-accent',
+        className
+      )}
+      {...props}
+    >
+      <span className="text-sm font-medium">{children}</span>
+      <ChevronDown
+        className={cn(
+          'h-4 w-4 transition-transform duration-200',
+          isOpen && 'rotate-180'
+        )}
+      />
+    </CollapsibleTrigger>
+  )
+}
+
+// ChainOfThought Content Component
+interface ChainOfThoughtContentProps extends React.ComponentProps<typeof CollapsibleContent> {
+  children: React.ReactNode
+}
+
+export function ChainOfThoughtContent({
+  children,
+  className,
+  ...props
+}: ChainOfThoughtContentProps) {
+  return (
+    <CollapsibleContent
+      className={cn(
+        'overflow-hidden transition-all',
+        'data-[state=closed]:animate-collapsible-up',
+        'data-[state=open]:animate-collapsible-down',
+        className
+      )}
+      {...props}
+    >
+      <div className="pt-3 space-y-3">
+        {children}
+      </div>
+    </CollapsibleContent>
   )
 }
 
 // ChainOfThought Step Component
 interface ChainOfThoughtStepProps extends React.ComponentProps<'div'> {
-  title: string
-  status: 'pending' | 'running' | 'complete'
-  isActive?: boolean
+  icon?: LucideIcon
+  label: string
+  description?: string
+  status?: 'complete' | 'active' | 'pending'
   children?: React.ReactNode
 }
 
 export function ChainOfThoughtStep({
-  title,
-  status,
-  isActive = false,
+  icon: Icon = Dot,
+  label,
+  description,
+  status = 'complete',
   children,
   className,
   ...props
 }: ChainOfThoughtStepProps) {
-  const getStatusIcon = () => {
-    switch (status) {
-      case 'complete':
-        return <Check className="h-4 w-4 text-green-600" />
-      case 'running':
-        return <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />
-      case 'pending':
-        return <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30" />
-    }
-  }
-
   const getStatusColor = () => {
     switch (status) {
       case 'complete':
-        return 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/50'
-      case 'running':
-        return 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/50'
+        return 'text-green-600 dark:text-green-400'
+      case 'active':
+        return 'text-blue-600 dark:text-blue-400'
+      case 'pending':
+        return 'text-muted-foreground'
+    }
+  }
+
+  const getBorderColor = () => {
+    switch (status) {
+      case 'complete':
+        return 'border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/30'
+      case 'active':
+        return 'border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/30'
       case 'pending':
         return 'border-muted bg-muted/30'
     }
@@ -135,19 +180,21 @@ export function ChainOfThoughtStep({
     <div
       className={cn(
         'flex gap-3 rounded-lg border p-3 transition-all',
-        getStatusColor(),
-        isActive && 'ring-2 ring-blue-200 dark:ring-blue-800',
+        getBorderColor(),
         className
       )}
       {...props}
     >
       <div className="flex h-6 w-6 shrink-0 items-center justify-center">
-        {getStatusIcon()}
+        <Icon className={cn('h-4 w-4', getStatusColor())} />
       </div>
       <div className="min-w-0 flex-1 space-y-2">
-        <div className="font-medium text-sm">{title}</div>
+        <div className="font-medium text-sm">{label}</div>
+        {description && (
+          <div className="text-sm text-muted-foreground">{description}</div>
+        )}
         {children && (
-          <div className="text-sm text-muted-foreground">
+          <div className="space-y-2">
             {children}
           </div>
         )}
@@ -156,30 +203,84 @@ export function ChainOfThoughtStep({
   )
 }
 
-// Hook for adding steps programmatically
+// ChainOfThought Search Results Container
+interface ChainOfThoughtSearchResultsProps extends React.ComponentProps<'div'> {
+  children: React.ReactNode
+}
+
+export function ChainOfThoughtSearchResults({
+  children,
+  className,
+  ...props
+}: ChainOfThoughtSearchResultsProps) {
+  return (
+    <div className={cn('flex flex-wrap gap-2', className)} {...props}>
+      {children}
+    </div>
+  )
+}
+
+// ChainOfThought Search Result Item
+interface ChainOfThoughtSearchResultProps extends React.ComponentProps<typeof Badge> {
+  children: React.ReactNode
+}
+
+export function ChainOfThoughtSearchResult({
+  children,
+  className,
+  variant = 'secondary',
+  ...props
+}: ChainOfThoughtSearchResultProps) {
+  return (
+    <Badge className={className} variant={variant} {...props}>
+      {children}
+    </Badge>
+  )
+}
+
+// ChainOfThought Image Component
+interface ChainOfThoughtImageProps extends React.ComponentProps<'div'> {
+  caption?: string
+  children: React.ReactNode
+}
+
+export function ChainOfThoughtImage({
+  caption,
+  children,
+  className,
+  ...props
+}: ChainOfThoughtImageProps) {
+  return (
+    <div className={cn('space-y-2', className)} {...props}>
+      <div className="rounded-lg overflow-hidden border">
+        {children}
+      </div>
+      {caption && (
+        <p className="text-xs text-muted-foreground text-center">{caption}</p>
+      )}
+    </div>
+  )
+}
+
+// Hook for adding steps programmatically (backward compatibility)
 export function useChainOfThoughtStep() {
-  const { addStep, updateStep } = useChainOfThought()
-  
   const createStep = React.useCallback((
     title: string,
     content?: React.ReactNode
   ) => {
-    addStep({
-      title,
-      content,
-      status: 'running'
-    })
-  }, [addStep])
+    // This is now a no-op since we're using a different API
+    // Kept for backward compatibility
+    console.warn('useChainOfThoughtStep is deprecated. Use the new declarative API with ChainOfThoughtStep components.')
+  }, [])
 
   const completeStep = React.useCallback((
     id: string,
     content?: React.ReactNode
   ) => {
-    updateStep(id, {
-      status: 'complete',
-      ...(content && { content })
-    })
-  }, [updateStep])
+    // This is now a no-op since we're using a different API
+    // Kept for backward compatibility
+    console.warn('useChainOfThoughtStep is deprecated. Use the new declarative API with ChainOfThoughtStep components.')
+  }, [])
 
   return { createStep, completeStep }
 }

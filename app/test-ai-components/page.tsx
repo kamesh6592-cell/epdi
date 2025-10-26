@@ -2,64 +2,74 @@
 
 import * as React from 'react'
 
+import { Search } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { 
-  Reasoning, 
-  ReasoningContent, 
-  ReasoningTrigger 
-} from '@/components/ai-elements/reasoning'
-import { 
   ChainOfThought, 
+  ChainOfThoughtContent,
+  ChainOfThoughtHeader,
+  ChainOfThoughtSearchResult,
+  ChainOfThoughtSearchResults,
   ChainOfThoughtStep,
-  useChainOfThoughtStep
 } from '@/components/ai-elements/chain-of-thought'
 import { 
   CodeBlock, 
   CodeBlockCopyButton 
 } from '@/components/ai-elements/code-block'
+import { 
+  Reasoning, 
+  ReasoningContent, 
+  ReasoningTrigger 
+} from '@/components/ai-elements/reasoning'
 
 function TestChainOfThought() {
-  const { createStep, completeStep } = useChainOfThoughtStep()
-  const [stepId, setStepId] = React.useState<string>()
-
-  const handleCreateStep = () => {
-    const id = Math.random().toString(36).substr(2, 9)
-    setStepId(id)
-    createStep('Analyzing the problem')
-  }
-
-  const handleCompleteStep = () => {
-    if (stepId) {
-      completeStep(stepId, 'Analysis complete - found 3 key insights')
-    }
-  }
-
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
-        <Button onClick={handleCreateStep}>Create Step</Button>
-        <Button onClick={handleCompleteStep} disabled={!stepId}>Complete Step</Button>
-      </div>
-      
-      <ChainOfThought>
-        <ChainOfThoughtStep 
-          title="Understanding the requirements" 
-          status="complete"
-        >
-          We need to implement AI reasoning components that match the AI SDK specifications.
-        </ChainOfThoughtStep>
-        
-        <ChainOfThoughtStep 
-          title="Implementing the solution" 
-          status="running"
-        >
-          Currently working on the Reasoning and ChainOfThought components...
-        </ChainOfThoughtStep>
-        
-        <ChainOfThoughtStep 
-          title="Testing the implementation" 
-          status="pending"
-        />
+      <ChainOfThought defaultOpen>
+        <ChainOfThoughtHeader />
+        <ChainOfThoughtContent>
+          <ChainOfThoughtStep
+            icon={Search}
+            label="Searching for information"
+            status="complete"
+          >
+            <ChainOfThoughtSearchResults>
+              <ChainOfThoughtSearchResult>
+                Next.js Documentation
+              </ChainOfThoughtSearchResult>
+              <ChainOfThoughtSearchResult>
+                React Best Practices
+              </ChainOfThoughtSearchResult>
+              <ChainOfThoughtSearchResult>
+                TypeScript Guide
+              </ChainOfThoughtSearchResult>
+            </ChainOfThoughtSearchResults>
+          </ChainOfThoughtStep>
+          
+          <ChainOfThoughtStep
+            label="Understanding the requirements"
+            description="Analyzing the user&apos;s needs and requirements"
+            status="complete"
+          >
+            We need to implement AI reasoning components that match the AI SDK specifications.
+            The components should be collapsible and support streaming content.
+          </ChainOfThoughtStep>
+          
+          <ChainOfThoughtStep
+            label="Implementing the solution"
+            description="Building the components with proper TypeScript support"
+            status="active"
+          >
+            Currently working on the Reasoning and ChainOfThought components...
+          </ChainOfThoughtStep>
+          
+          <ChainOfThoughtStep
+            label="Testing the implementation"
+            description="Verifying all features work correctly"
+            status="pending"
+          />
+        </ChainOfThoughtContent>
       </ChainOfThought>
     </div>
   )
@@ -106,10 +116,10 @@ console.log(fibonacci(10)); // Output: 55`
               Let me think about this step by step:
             </p>
             <ol className="list-decimal list-inside space-y-1">
-              <li>First, I need to understand the user's requirements</li>
+              <li>First, I need to understand the user&apos;s requirements</li>
               <li>Then, I should analyze the available options</li>
-              <li>Next, I'll evaluate the pros and cons</li>
-              <li>Finally, I'll provide a recommendation</li>
+              <li>Next, I&apos;ll evaluate the pros and cons</li>
+              <li>Finally, I&apos;ll provide a recommendation</li>
             </ol>
             {isReasoningStreaming && (
               <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">

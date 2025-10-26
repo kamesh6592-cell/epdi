@@ -5,7 +5,6 @@ import * as React from 'react'
 import { ChevronDown } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
-
 import {
   Collapsible,
   CollapsibleContent,
@@ -56,10 +55,16 @@ export function Reasoning({
     onOpenChange?.(newOpen)
   }, [isControlled, onOpenChange])
 
-  // Auto-open when streaming starts
+  // Auto-open when streaming starts, auto-close when streaming ends
   React.useEffect(() => {
     if (isStreaming && !isOpen) {
       setIsOpen(true)
+    } else if (!isStreaming && isOpen) {
+      // Auto-close when streaming finishes
+      const timer = setTimeout(() => {
+        setIsOpen(false)
+      }, 500) // Small delay before auto-closing
+      return () => clearTimeout(timer)
     }
   }, [isStreaming, isOpen, setIsOpen])
 
