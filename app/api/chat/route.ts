@@ -34,6 +34,7 @@ export async function POST(req: Request) {
     const cookieStore = await cookies()
     const modelJson = cookieStore.get('selectedModel')?.value
     const searchMode = cookieStore.get('search-mode')?.value === 'true'
+    const deepDiveMode = cookieStore.get('deepdive-mode')?.value === 'true'
 
     let selectedModel = DEFAULT_MODEL
 
@@ -66,6 +67,7 @@ export async function POST(req: Request) {
           model: selectedModel,
           chatId,
           searchMode,
+          deepDiveMode,
           userId
         })
       : createManualToolStreamResponse({
@@ -73,6 +75,7 @@ export async function POST(req: Request) {
           model: selectedModel,
           chatId,
           searchMode,
+          deepDiveMode,
           userId
         })
   } catch (error) {

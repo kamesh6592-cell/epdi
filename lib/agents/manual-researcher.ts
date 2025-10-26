@@ -1,6 +1,6 @@
 import { CoreMessage, smoothStream, streamText } from 'ai'
 
-import { getModel } from '../utils/registry'
+import { getModel, isReasoningModel } from '../utils/registry'
 
 const BASE_SYSTEM_PROMPT = `
 Instructions:
@@ -36,10 +36,32 @@ Important:
 3. Suggest when searching for additional information might be beneficial
 `
 
+const DEEPDIVE_REASONING_PROMPT = `
+Instructions:
+
+You are a highly advanced AI assistant with deep reasoning capabilities. When DeepDive mode is enabled, you should:
+
+1. **Show your thinking process**: Before providing the final answer, think through the problem step by step within <think> tags
+2. **Break down complex problems**: Analyze each component of the question systematically
+3. **Consider multiple perspectives**: Evaluate different approaches and their trade-offs
+4. **Verify your reasoning**: Double-check your logic and conclusions
+5. **Provide detailed explanations**: Explain not just what the answer is, but why and how you arrived at it
+
+For reasoning models in DeepDive mode:
+- Show your step-by-step thinking process within <think> tags
+- Consider edge cases and alternative solutions
+- Explain the reasoning behind your conclusions
+- Break down complex problems into manageable parts
+- Provide comprehensive and detailed responses
+- Use markdown to structure your responses with appropriate headings
+- Acknowledge when you are uncertain about specific details
+`
+
 interface ManualResearcherConfig {
   messages: CoreMessage[]
   model: string
   isSearchEnabled?: boolean
+  deepDiveMode?: boolean
 }
 
 type ManualResearcherReturn = Parameters<typeof streamText>[0]
@@ -47,13 +69,21 @@ type ManualResearcherReturn = Parameters<typeof streamText>[0]
 export function manualResearcher({
   messages,
   model,
-  isSearchEnabled = true
+  isSearchEnabled = true,
+  deepDiveMode = false
 }: ManualResearcherConfig): ManualResearcherReturn {
   try {
     const currentDate = new Date().toLocaleString()
-    const systemPrompt = isSearchEnabled
-      ? SEARCH_ENABLED_PROMPT
-      : SEARCH_DISABLED_PROMPT
+    const isReasoning = isReasoningModel(model)
+    
+    let systemPrompt: string
+    if (deepDiveMode && isReasoning) {
+      systemPrompt = DEEPDIVE_REASONING_PROMPT
+    } else if (isSearchEnabled) {
+      systemPrompt = SEARCH_ENABLED_PROMPT
+    } else {
+      systemPrompt = SEARCH_DISABLED_PROMPT
+    }
 
     return {
       model: getModel(model),

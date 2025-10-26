@@ -1,6 +1,6 @@
-# Nexa
+# Nexa - AI Chat with Reasoning
 
-An AI-powered search engine with a generative UI.
+A production-ready AI chat application with advanced reasoning capabilities.
 
 ![capture](/public/screenshot-2025-05-04.png)
 

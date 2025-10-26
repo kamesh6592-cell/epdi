@@ -7,5 +7,6 @@ export interface BaseStreamConfig {
   model: Model
   chatId: string
   searchMode: boolean
+  deepDiveMode: boolean
   userId: string
 }

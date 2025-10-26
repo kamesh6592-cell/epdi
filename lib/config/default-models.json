@@ -107,6 +107,15 @@
       "toolCallModel": "gemini-2.0-flash"
     },
     {
+      "id": "deepseek/deepseek-r1-0528-qwen3-8b:free",
+      "name": "DeepSeek R1 Qwen (Free)",
+      "provider": "OpenRouter",
+      "providerId": "openrouter",
+      "enabled": true,
+      "toolCallType": "manual",
+      "toolCallModel": "anthropic/claude-3-haiku"
+    },
+    {
       "id": "accounts/fireworks/models/deepseek-r1",
       "name": "DeepSeek R1",
       "provider": "Fireworks",

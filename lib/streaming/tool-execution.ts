@@ -23,7 +23,8 @@ export async function executeToolCall(
   coreMessages: CoreMessage[],
   dataStream: DataStreamWriter,
   model: string,
-  searchMode: boolean
+  searchMode: boolean,
+  deepDiveMode: boolean = false
 ): Promise<ToolExecutionResult> {
   // If search mode is disabled, return empty tool call
   if (!searchMode) {

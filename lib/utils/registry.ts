@@ -37,6 +37,10 @@ export const registry = createProviderRegistry({
     apiKey: process.env.OPENAI_COMPATIBLE_API_KEY,
     baseURL: process.env.OPENAI_COMPATIBLE_API_BASE_URL
   }),
+  openrouter: createOpenAI({
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseURL: 'https://openrouter.ai/api/v1'
+  }),
   xai
 })
 
@@ -84,6 +88,20 @@ export function getModel(model: string) {
     })
   }
 
+  // if model is openrouter and includes deepseek-r1, add reasoning middleware
+  if (model.includes('openrouter') && model.includes('deepseek-r1')) {
+    const openrouterProvider = createOpenAI({
+      apiKey: process.env.OPENROUTER_API_KEY,
+      baseURL: 'https://openrouter.ai/api/v1'
+    })
+    return wrapLanguageModel({
+      model: openrouterProvider(modelName),
+      middleware: extractReasoningMiddleware({
+        tagName: 'think'
+      })
+    })
+  }
+
   return registry.languageModel(
     model as Parameters<typeof registry.languageModel>[0]
   )
@@ -114,6 +132,8 @@ export function isProviderEnabled(providerId: string): boolean {
         !!process.env.OPENAI_COMPATIBLE_API_KEY &&
         !!process.env.OPENAI_COMPATIBLE_API_BASE_URL
       )
+    case 'openrouter':
+      return !!process.env.OPENROUTER_API_KEY
     default:
       return false
   }
