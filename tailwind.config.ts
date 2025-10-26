@@ -144,6 +144,8 @@ const config = {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'collapse-down': 'collapse-down 0.1s ease-in-out',
         'collapse-up': 'collapse-up 0.1s ease-in-out',
+        'collapsible-down': 'collapse-down 0.2s ease-out',
+        'collapsible-up': 'collapse-up 0.2s ease-out',
         'slide-in-right': 'slide-in-right 0.2s ease-out',
         'slide-out-right': 'slide-out-right 0.2s ease-out'
       },

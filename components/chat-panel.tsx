@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 import { useArtifact } from './artifact/artifact-context'
 import { Button } from './ui/button'
 import { IconLogo } from './ui/icons'
+import { DeepDiveToggle } from './deepdive-toggle'
 import { EmptyScreen } from './empty-screen'
 import { ModelSelector } from './model-selector'
 import { SearchModeToggle } from './search-mode-toggle'
@@ -186,6 +187,7 @@ export function ChatPanel({
             <div className="flex items-center gap-2">
               <ModelSelector models={models || []} />
               <SearchModeToggle />
+              <DeepDiveToggle />
             </div>
             <div className="flex items-center gap-2">
               {messages.length > 0 && (
