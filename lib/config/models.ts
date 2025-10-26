@@ -53,7 +53,7 @@ export async function getModels(): Promise<Model[]> {
       const config = JSON.parse(text)
       if (Array.isArray(config.models) && config.models.every(validateModel)) {
         console.log('Successfully loaded models from URL')
-        staticModels = config.models
+        staticModels = config.models as Model[]
       }
     } catch (error: any) {
       // Fallback to default models if fetch fails
@@ -67,7 +67,7 @@ export async function getModels(): Promise<Model[]> {
         defaultModels.models.every(validateModel)
       ) {
         console.log('Successfully loaded default models')
-        staticModels = defaultModels.models
+        staticModels = defaultModels.models as Model[]
       }
     }
 

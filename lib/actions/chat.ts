@@ -6,8 +6,13 @@ import { redirect } from 'next/navigation'
 import { getRedisClient, RedisWrapper } from '@/lib/redis/config'
 import { type Chat } from '@/lib/types'
 
-async function getRedis(): Promise<RedisWrapper> {
-  return await getRedisClient()
+async function getRedis(): Promise<RedisWrapper | null> {
+  try {
+    return await getRedisClient()
+  } catch (error) {
+    console.warn('Redis not configured, chat history will not be saved:', error)
+    return null
+  }
 }
 
 const CHAT_VERSION = 'v2'
@@ -22,6 +27,9 @@ export async function getChats(userId?: string | null) {
 
   try {
     const redis = await getRedis()
+    if (!redis) {
+      return []
+    }
     const chats = await redis.zrange(getUserChatKey(userId), 0, -1, {
       rev: true
     })
@@ -70,6 +78,9 @@ export async function getChatsPage(
 ): Promise<{ chats: Chat[]; nextOffset: number | null }> {
   try {
     const redis = await getRedis()
+    if (!redis) {
+      return { chats: [], nextOffset: null }
+    }
     const userChatKey = getUserChatKey(userId)
     const start = offset
     const end = offset + limit - 1
@@ -82,9 +93,11 @@ export async function getChatsPage(
       return { chats: [], nextOffset: null }
     }
 
+    // Create a non-null redis reference for the closure
+    const redisClient = redis
     const results = await Promise.all(
       chatKeys.map(async chatKey => {
-        const chat = await redis.hgetall(chatKey)
+        const chat = await redisClient.hgetall(chatKey)
         return chat
       })
     )
@@ -121,6 +134,9 @@ export async function getChatsPage(
 
 export async function getChat(id: string, userId: string = 'anonymous') {
   const redis = await getRedis()
+  if (!redis) {
+    return null
+  }
   const chat = await redis.hgetall<Chat>(`chat:${id}`)
 
   if (!chat) {
@@ -148,6 +164,9 @@ export async function clearChats(
   userId: string = 'anonymous'
 ): Promise<{ error?: string }> {
   const redis = await getRedis()
+  if (!redis) {
+    return { error: 'Redis not configured' }
+  }
   const userChatKey = getUserChatKey(userId)
   const chats = await redis.zrange(userChatKey, 0, -1)
   if (!chats.length) {
@@ -172,6 +191,9 @@ export async function deleteChat(
 ): Promise<{ error?: string }> {
   try {
     const redis = await getRedis()
+    if (!redis) {
+      return { error: 'Redis not configured' }
+    }
     const userKey = getUserChatKey(userId)
     const chatKey = `chat:${chatId}`
 
@@ -205,6 +227,11 @@ export async function deleteChat(
 export async function saveChat(chat: Chat, userId: string = 'anonymous') {
   try {
     const redis = await getRedis()
+    if (!redis) {
+      console.warn('Redis not configured, chat will not be saved')
+      return null
+    }
+
     const pipeline = redis.pipeline()
 
     const chatToSave = {
@@ -225,6 +252,9 @@ export async function saveChat(chat: Chat, userId: string = 'anonymous') {
 
 export async function getSharedChat(id: string) {
   const redis = await getRedis()
+  if (!redis) {
+    return null
+  }
   const chat = await redis.hgetall<Chat>(`chat:${id}`)
 
   if (!chat || !chat.sharePath) {
@@ -236,6 +266,9 @@ export async function getSharedChat(id: string) {
 
 export async function shareChat(id: string, userId: string = 'anonymous') {
   const redis = await getRedis()
+  if (!redis) {
+    return null
+  }
   const chat = await redis.hgetall<Chat>(`chat:${id}`)
 
   if (!chat || chat.userId !== userId) {
