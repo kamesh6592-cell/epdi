@@ -14,6 +14,8 @@ import {
   ChainOfThoughtSearchResult,
   ChainOfThoughtSearchResults,
   ChainOfThoughtStep,
+  CodeBlock,
+  CodeBlockCopyButton,
   Reasoning,
   ReasoningContent,
   ReasoningTrigger,
@@ -45,7 +47,7 @@ export default function AIElementsDemo() {
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold">AI Elements Demo</h1>
         <p className="text-muted-foreground">
-          Demonstration of Reasoning and Chain of Thought components
+          Demonstration of Reasoning, Chain of Thought, and Code Block components
         </p>
         <div className="flex gap-4 justify-center">
           <Button onClick={simulateReasoning}>
@@ -160,6 +162,102 @@ export default function AIElementsDemo() {
             />
           </ChainOfThoughtContent>
         </ChainOfThought>
+      </div>
+
+      {/* Code Block Demo */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Code Block Component</h2>
+        
+        <div className="grid gap-4">
+          <div>
+            <h3 className="text-lg font-medium mb-2">JavaScript Example</h3>
+            <CodeBlock 
+              code={`function fibonacci(n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// Usage example
+console.log(fibonacci(10)); // Output: 55`}
+              language="javascript"
+              showLineNumbers={true}
+            >
+              <CodeBlockCopyButton
+                onCopy={() => console.log('JavaScript code copied!')}
+              />
+            </CodeBlock>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-medium mb-2">TypeScript Interface</h3>
+            <CodeBlock 
+              code={`interface User {
+  id: number;
+  name: string;
+  email: string;
+  isActive: boolean;
+}
+
+const createUser = (userData: Partial<User>): User => {
+  return {
+    id: Math.random(),
+    isActive: true,
+    ...userData,
+  } as User;
+};`}
+              language="typescript"
+              showLineNumbers={true}
+            >
+              <CodeBlockCopyButton />
+            </CodeBlock>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-medium mb-2">Python Algorithm</h3>
+            <CodeBlock 
+              code={`def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    
+    return quicksort(left) + middle + quicksort(right)
+
+# Example usage
+numbers = [3, 6, 8, 10, 1, 2, 1]
+sorted_numbers = quicksort(numbers)
+print(sorted_numbers)  # [1, 1, 2, 3, 6, 8, 10]`}
+              language="python"
+              showLineNumbers={true}
+            >
+              <CodeBlockCopyButton />
+            </CodeBlock>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-medium mb-2">CSS Styling</h3>
+            <CodeBlock 
+              code={`.card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}`}
+              language="css"
+            >
+              <CodeBlockCopyButton />
+            </CodeBlock>
+          </div>
+        </div>
       </div>
 
       {/* Combined Example */}
