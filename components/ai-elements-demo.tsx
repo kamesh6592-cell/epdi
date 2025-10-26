@@ -1,7 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Brain, Check, Search, Eye } from 'lucide-react'
+
+import { Brain, Check, Eye,Search } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
 
 import {
   ChainOfThought,
@@ -15,7 +18,6 @@ import {
   ReasoningContent,
   ReasoningTrigger,
 } from '@/components/ai-elements'
-import { Button } from '@/components/ui/button'
 
 export default function AIElementsDemo() {
   const [isReasoningStreaming, setIsReasoningStreaming] = useState(false)
@@ -66,7 +68,7 @@ export default function AIElementsDemo() {
             <div className="prose prose-sm max-w-none dark:prose-invert">
               <p>
                 I need to analyze this problem step by step. First, let me consider
-                the user's question and identify the key components that need to be
+                the user&apos;s question and identify the key components that need to be
                 addressed.
               </p>
               <p>
@@ -102,13 +104,13 @@ export default function AIElementsDemo() {
               {chainStep >= 1 && (
                 <ChainOfThoughtSearchResults>
                   <ChainOfThoughtSearchResult>
-                    Research Paper: "AI Reasoning Methods"
+                    Research Paper: &quot;AI Reasoning Methods&quot;
                   </ChainOfThoughtSearchResult>
                   <ChainOfThoughtSearchResult>
-                    Article: "Best Practices for AI Development"
+                    Article: &quot;Best Practices for AI Development&quot;
                   </ChainOfThoughtSearchResult>
                   <ChainOfThoughtSearchResult>
-                    Study: "Human-AI Interaction Patterns"
+                    Study: &quot;Human-AI Interaction Patterns&quot;
                   </ChainOfThoughtSearchResult>
                 </ChainOfThoughtSearchResults>
               )}
@@ -168,7 +170,7 @@ export default function AIElementsDemo() {
           <ReasoningContent>
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Here's how I approached this complex problem:
+                Here&apos;s how I approached this complex problem:
               </p>
               
               <ChainOfThought defaultOpen>
