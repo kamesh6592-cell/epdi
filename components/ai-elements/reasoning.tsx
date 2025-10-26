@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { ChevronDown, Lightbulb, Loader2 } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 
@@ -22,7 +22,7 @@ const ReasoningContext = React.createContext<ReasoningContextType | undefined>(
   undefined
 )
 
-const useReasoning = () => {
+function useReasoning() {
   const context = React.useContext(ReasoningContext)
   if (!context) {
     throw new Error('useReasoning must be used within a Reasoning component')
@@ -30,145 +30,124 @@ const useReasoning = () => {
   return context
 }
 
+// Main Reasoning Component
 interface ReasoningProps extends React.ComponentProps<typeof Collapsible> {
   isStreaming?: boolean
   children: React.ReactNode
 }
 
-const Reasoning = React.forwardRef<
-  React.ElementRef<typeof Collapsible>,
-  ReasoningProps
->(({ isStreaming = false, children, className, ...props }, ref) => {
-  const [isOpen, setIsOpen] = React.useState(false)
-
-  // Auto-open when streaming, auto-close when streaming stops
-  React.useEffect(() => {
-    if (isStreaming) {
-      setIsOpen(true)
-    } else if (!isStreaming && isOpen) {
-      // Add a small delay before auto-closing to let user see the content
-      const timer = setTimeout(() => {
-        setIsOpen(false)
-      }, 1000)
-      return () => clearTimeout(timer)
+export function Reasoning({
+  isStreaming = false,
+  children,
+  className,
+  open,
+  defaultOpen,
+  onOpenChange,
+  ...props
+}: ReasoningProps) {
+  const [internalOpen, setInternalOpen] = React.useState(defaultOpen ?? false)
+  
+  const isControlled = open !== undefined
+  const isOpen = isControlled ? open : internalOpen
+  const setIsOpen = React.useCallback((newOpen: boolean) => {
+    if (!isControlled) {
+      setInternalOpen(newOpen)
     }
-  }, [isStreaming, isOpen])
+    onOpenChange?.(newOpen)
+  }, [isControlled, onOpenChange])
+
+  // Auto-open when streaming starts
+  React.useEffect(() => {
+    if (isStreaming && !isOpen) {
+      setIsOpen(true)
+    }
+  }, [isStreaming, isOpen, setIsOpen])
+
+  const contextValue = React.useMemo(() => ({
+    isStreaming,
+    isOpen,
+    setIsOpen
+  }), [isStreaming, isOpen, setIsOpen])
 
   return (
-    <ReasoningContext.Provider value={{ isStreaming, isOpen, setIsOpen }}>
+    <ReasoningContext.Provider value={contextValue}>
       <Collapsible
-        ref={ref}
         open={isOpen}
         onOpenChange={setIsOpen}
-        className={cn('space-y-2', className)}
+        className={cn('w-full', className)}
         {...props}
       >
         {children}
       </Collapsible>
     </ReasoningContext.Provider>
   )
-})
-Reasoning.displayName = 'Reasoning'
+}
 
-interface ReasoningTriggerProps
-  extends React.ComponentProps<typeof CollapsibleTrigger> {
+// Reasoning Trigger Component
+interface ReasoningTriggerProps extends React.ComponentProps<typeof CollapsibleTrigger> {
   title?: string
 }
 
-const ReasoningTrigger = React.forwardRef<
-  React.ElementRef<typeof CollapsibleTrigger>,
-  ReasoningTriggerProps
->(({ title = 'Reasoning', className, children, ...props }, ref) => {
-  const { isStreaming, isOpen } = useReasoning()
+export function ReasoningTrigger({
+  title = 'Reasoning',
+  className,
+  children,
+  ...props
+}: ReasoningTriggerProps) {
+  const { isOpen, isStreaming } = useReasoning()
 
   return (
     <CollapsibleTrigger
-      ref={ref}
       className={cn(
-        'flex w-full items-center justify-between rounded-lg border bg-card p-3 text-left hover:bg-accent/50 transition-colors',
+        'flex w-full items-center justify-between rounded-lg border bg-card p-3 text-left text-sm font-medium transition-colors',
+        'hover:bg-accent hover:text-accent-foreground',
         'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-        isStreaming && 'border-primary/50 bg-primary/5',
+        'data-[state=open]:bg-accent',
         className
       )}
       {...props}
     >
       <div className="flex items-center gap-2">
-        <div className="relative">
-          <Lightbulb
-            size={16}
-            className={cn(
-              'text-muted-foreground',
-              isStreaming && 'text-primary'
-            )}
-          />
-          {isStreaming && (
-            <div className="absolute inset-0 animate-pulse">
-              <Lightbulb size={16} className="text-primary/70" />
-            </div>
-          )}
-        </div>
-        <span
-          className={cn('text-sm font-medium', isStreaming && 'text-primary')}
-        >
-          {title}
-        </span>
         {isStreaming && (
-          <Loader2 size={14} className="animate-spin text-primary/70" />
+          <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
         )}
+        <span className="text-sm font-medium">{children || title}</span>
       </div>
       <ChevronDown
-        size={16}
         className={cn(
-          'text-muted-foreground transition-transform duration-200',
+          'h-4 w-4 transition-transform duration-200',
           isOpen && 'rotate-180'
         )}
       />
-      {children}
     </CollapsibleTrigger>
   )
-})
-ReasoningTrigger.displayName = 'ReasoningTrigger'
+}
 
-interface ReasoningContentProps
-  extends React.ComponentProps<typeof CollapsibleContent> {}
+// Reasoning Content Component
+interface ReasoningContentProps extends React.ComponentProps<typeof CollapsibleContent> {
+  children: React.ReactNode
+}
 
-const ReasoningContent = React.forwardRef<
-  React.ElementRef<typeof CollapsibleContent>,
-  ReasoningContentProps
->(({ className, children, ...props }, ref) => {
-  const { isStreaming } = useReasoning()
-
+export function ReasoningContent({
+  children,
+  className,
+  ...props
+}: ReasoningContentProps) {
   return (
     <CollapsibleContent
-      ref={ref}
       className={cn(
-        'rounded-lg border border-t-0 bg-card/50 p-4 text-sm text-muted-foreground',
-        'data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down',
-        'overflow-hidden transition-all',
-        isStreaming && 'border-primary/30 bg-primary/5',
+        'overflow-hidden text-sm transition-all',
+        'data-[state=closed]:animate-collapsible-up',
+        'data-[state=open]:animate-collapsible-down',
         className
       )}
       {...props}
     >
-      <div
-        className={cn(
-          'prose prose-sm max-w-none dark:prose-invert',
-          'prose-p:leading-relaxed prose-p:text-muted-foreground',
-          'prose-headings:text-foreground prose-strong:text-foreground',
-          isStreaming && 'prose-p:text-primary/80'
-        )}
-      >
-        {children}
-        {isStreaming && (
-          <div className="mt-2 flex items-center gap-2 text-xs text-primary/70">
-            <Loader2 size={12} className="animate-spin" />
-            <span>Thinking...</span>
-          </div>
-        )}
+      <div className="border-l-2 border-muted-foreground/20 pl-4 pt-3 pb-1">
+        <div className="text-sm text-muted-foreground space-y-2">
+          {children}
+        </div>
       </div>
     </CollapsibleContent>
   )
-})
-ReasoningContent.displayName = 'ReasoningContent'
-
-export { Reasoning, ReasoningContent,ReasoningTrigger }
+}
