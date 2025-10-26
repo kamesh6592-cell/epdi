@@ -7,7 +7,8 @@
       "providerId": "openrouter",
       "enabled": true,
       "toolCallType": "manual",
-      "toolCallModel": "anthropic/claude-3-haiku"
+      "toolCallModel": "anthropic/claude-3-haiku",
+      "avatar": "/providers/logos/deepseek.svg"
     },
     {
       "id": "gpt-4.1",

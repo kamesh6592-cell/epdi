@@ -89,7 +89,7 @@ export function ModelSelector({ models }: ModelSelectorProps) {
           {selectedModel ? (
             <div className="flex items-center space-x-1">
               <Image
-                src={`/providers/logos/${selectedModel.providerId}.svg`}
+                src={selectedModel.avatar || `/providers/logos/${selectedModel.providerId}.svg`}
                 alt={selectedModel.provider}
                 width={18}
                 height={18}
@@ -124,7 +124,7 @@ export function ModelSelector({ models }: ModelSelectorProps) {
                     >
                       <div className="flex items-center space-x-2">
                         <Image
-                          src={`/providers/logos/${model.providerId}.svg`}
+                          src={model.avatar || `/providers/logos/${model.providerId}.svg`}
                           alt={model.provider}
                           width={18}
                           height={18}

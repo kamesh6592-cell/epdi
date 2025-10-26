@@ -105,23 +105,24 @@ export function ReasoningTrigger({
   return (
     <CollapsibleTrigger
       className={cn(
-        'flex w-full items-center justify-between rounded-lg border bg-card p-3 text-left text-sm font-medium transition-colors',
+        'flex w-full items-center justify-between rounded-lg border bg-card p-2 sm:p-3 text-left text-xs sm:text-sm font-medium transition-colors',
         'hover:bg-accent hover:text-accent-foreground',
         'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
         'data-[state=open]:bg-accent',
+        'min-h-[44px]',
         className
       )}
       {...props}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
         {isStreaming && (
-          <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+          <div className="h-2 w-2 shrink-0 rounded-full bg-blue-500 animate-pulse" />
         )}
-        <span className="text-sm font-medium">{children || title}</span>
+        <span className="text-xs sm:text-sm font-medium truncate">{children || title}</span>
       </div>
       <ChevronDown
         className={cn(
-          'h-4 w-4 transition-transform duration-200',
+          'h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 ml-2 transition-transform duration-200',
           isOpen && 'rotate-180'
         )}
       />
@@ -142,15 +143,15 @@ export function ReasoningContent({
   return (
     <CollapsibleContent
       className={cn(
-        'overflow-hidden text-sm transition-all',
+        'overflow-hidden text-xs sm:text-sm transition-all',
         'data-[state=closed]:animate-collapsible-up',
         'data-[state=open]:animate-collapsible-down',
         className
       )}
       {...props}
     >
-      <div className="border-l-2 border-muted-foreground/20 pl-4 pt-3 pb-1">
-        <div className="text-sm text-muted-foreground space-y-2">
+      <div className="border-l-2 border-muted-foreground/20 pl-2 sm:pl-4 pt-2 sm:pt-3 pb-1 overflow-x-auto">
+        <div className="text-xs sm:text-sm text-muted-foreground space-y-2 break-words">
           {children}
         </div>
       </div>

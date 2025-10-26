@@ -32,7 +32,7 @@ export function ReasoningSection({
   if (!content) return null
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2 sm:gap-4">
       <Reasoning
         className="w-full"
         isStreaming={isStreaming}
@@ -51,12 +51,13 @@ export function ReasoningSection({
           <div className="ml-auto">
             {content.time === 0 ? (
               <Loader2
-                size={16}
-                className="animate-spin text-muted-foreground/50"
+                size={14}
+                className="sm:size-4 animate-spin text-muted-foreground/50"
               />
             ) : (
               <StatusIndicator icon={Check} iconClassName="text-green-500">
-                {`${content.reasoning.length.toLocaleString()} characters`}
+                <span className="hidden sm:inline">{`${content.reasoning.length.toLocaleString()} characters`}</span>
+                <span className="inline sm:hidden">{`${Math.round(content.reasoning.length / 100) / 10}k`}</span>
               </StatusIndicator>
             )}
           </div>
@@ -64,7 +65,7 @@ export function ReasoningSection({
         <ReasoningContent>
           <BotMessage
             message={content.reasoning}
-            className="prose-p:text-muted-foreground"
+            className="prose-p:text-muted-foreground text-xs sm:text-sm"
           />
         </ReasoningContent>
       </Reasoning>

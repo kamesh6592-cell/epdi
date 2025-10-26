@@ -91,18 +91,19 @@ export function ChainOfThoughtHeader({
   return (
     <CollapsibleTrigger
       className={cn(
-        'flex w-full items-center justify-between rounded-lg border bg-card p-3 text-left text-sm font-medium transition-colors',
+        'flex w-full items-center justify-between rounded-lg border bg-card p-2 sm:p-3 text-left text-xs sm:text-sm font-medium transition-colors',
         'hover:bg-accent hover:text-accent-foreground',
         'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
         'data-[state=open]:bg-accent',
+        'min-h-[44px]',
         className
       )}
       {...props}
     >
-      <span className="text-sm font-medium">{children}</span>
+      <span className="text-xs sm:text-sm font-medium truncate pr-2">{children}</span>
       <ChevronDown
         className={cn(
-          'h-4 w-4 transition-transform duration-200',
+          'h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 transition-transform duration-200',
           isOpen && 'rotate-180'
         )}
       />
@@ -130,7 +131,7 @@ export function ChainOfThoughtContent({
       )}
       {...props}
     >
-      <div className="pt-3 space-y-3">
+      <div className="pt-2 sm:pt-3 space-y-2 sm:space-y-3">
         {children}
       </div>
     </CollapsibleContent>
@@ -180,22 +181,22 @@ export function ChainOfThoughtStep({
   return (
     <div
       className={cn(
-        'flex gap-3 rounded-lg border p-3 transition-all',
+        'flex gap-2 sm:gap-3 rounded-lg border p-2 sm:p-3 transition-all',
         getBorderColor(),
         className
       )}
       {...props}
     >
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center">
-        <Icon className={cn('h-4 w-4', getStatusColor())} />
+      <div className="flex h-5 w-5 sm:h-6 sm:w-6 shrink-0 items-center justify-center">
+        <Icon className={cn('h-3.5 w-3.5 sm:h-4 sm:w-4', getStatusColor())} />
       </div>
-      <div className="min-w-0 flex-1 space-y-2">
-        <div className="font-medium text-sm">{label}</div>
+      <div className="min-w-0 flex-1 space-y-1 sm:space-y-2">
+        <div className="font-medium text-xs sm:text-sm break-words">{label}</div>
         {description && (
-          <div className="text-sm text-muted-foreground">{description}</div>
+          <div className="text-xs sm:text-sm text-muted-foreground break-words">{description}</div>
         )}
         {children && (
-          <div className="space-y-2">
+          <div className="space-y-1 sm:space-y-2">
             {children}
           </div>
         )}
@@ -215,7 +216,7 @@ export function ChainOfThoughtSearchResults({
   ...props
 }: ChainOfThoughtSearchResultsProps) {
   return (
-    <div className={cn('flex flex-wrap gap-2', className)} {...props}>
+    <div className={cn('flex flex-wrap gap-1.5 sm:gap-2', className)} {...props}>
       {children}
     </div>
   )
@@ -233,7 +234,7 @@ export function ChainOfThoughtSearchResult({
   ...props
 }: ChainOfThoughtSearchResultProps) {
   return (
-    <Badge className={className} variant={variant} {...props}>
+    <Badge className={cn('text-xs', className)} variant={variant} {...props}>
       {children}
     </Badge>
   )
@@ -252,12 +253,12 @@ export function ChainOfThoughtImage({
   ...props
 }: ChainOfThoughtImageProps) {
   return (
-    <div className={cn('space-y-2', className)} {...props}>
+    <div className={cn('space-y-1.5 sm:space-y-2', className)} {...props}>
       <div className="rounded-lg overflow-hidden border">
         {children}
       </div>
       {caption && (
-        <p className="text-xs text-muted-foreground text-center">{caption}</p>
+        <p className="text-[10px] sm:text-xs text-muted-foreground text-center break-words px-1">{caption}</p>
       )}
     </div>
   )
