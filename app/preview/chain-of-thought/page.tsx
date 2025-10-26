@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 
+import Image from 'next/image'
 import { Search } from 'lucide-react'
 
 import {
@@ -52,9 +53,11 @@ export default function ChainOfThoughtPreview() {
               status="complete"
             >
               <ChainOfThoughtImage caption="Hayden Bleasel's profile photo from x.com, showing a Ghibli-style man.">
-                <img
+                <Image
                   src="https://pbs.twimg.com/profile_images/1831737932413661184/0e6w7ixs_400x400.jpg"
                   alt="Hayden Bleasel"
+                  width={400}
+                  height={400}
                   className="w-full h-auto"
                 />
               </ChainOfThoughtImage>

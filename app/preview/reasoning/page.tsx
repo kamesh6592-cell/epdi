@@ -2,12 +2,12 @@
 
 import * as React from 'react'
 
-import { Button } from '@/components/ui/button'
 import {
   Reasoning,
   ReasoningContent,
   ReasoningTrigger,
 } from '@/components/ai-elements/reasoning'
+import { Button } from '@/components/ui/button'
 
 const reasoningSteps = [
   'Let me think about this problem step by step.',
