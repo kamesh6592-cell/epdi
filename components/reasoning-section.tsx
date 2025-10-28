@@ -6,18 +6,17 @@ import {
   Reasoning,
   ReasoningContent,
   ReasoningTrigger
-} from '@/components/ai-elements/reasoning'
+} from '@/components/elements/reasoning'
 
 import { StatusIndicator } from './ui/status-indicator'
-import { BotMessage } from './message'
 
-interface ReasoningContent {
+interface ReasoningContentData {
   reasoning: string
   time?: number
 }
 
 export interface ReasoningSectionProps {
-  content: ReasoningContent
+  content: ReasoningContentData
   isOpen: boolean
   onOpenChange: (open: boolean) => void
 }
@@ -28,45 +27,46 @@ export function ReasoningSection({
   onOpenChange
 }: ReasoningSectionProps) {
   const isStreaming = content.time === 0
+  const duration = content.time ? Math.round(content.time / 1000) : 0
 
-  if (!content) return null
+  if (!content || !content.reasoning) return null
 
   return (
-    <div className="flex flex-col gap-2 sm:gap-4">
+    <div className="flex flex-col gap-2 sm:gap-4 w-full max-w-full overflow-hidden">
       <Reasoning
-        className="w-full"
+        className="w-full max-w-full"
         isStreaming={isStreaming}
         open={isOpen}
         onOpenChange={onOpenChange}
+        duration={duration}
+        defaultOpen={false}
       >
-        <ReasoningTrigger
-          title={
-            content.time === 0
-              ? 'Thinking...'
-              : content.time !== undefined && content.time > 0
-                ? `Thought for ${(content.time / 1000).toFixed(1)} seconds`
-                : 'Thoughts'
-          }
-        >
-          <div className="ml-auto">
-            {content.time === 0 ? (
-              <Loader2
-                size={14}
-                className="sm:size-4 animate-spin text-muted-foreground/50"
-              />
-            ) : (
-              <StatusIndicator icon={Check} iconClassName="text-green-500">
-                <span className="hidden sm:inline">{`${content.reasoning.length.toLocaleString()} characters`}</span>
-                <span className="inline sm:hidden">{`${Math.round(content.reasoning.length / 100) / 10}k`}</span>
-              </StatusIndicator>
-            )}
+        <ReasoningTrigger>
+          <div className="flex items-center justify-between w-full">
+            <span className="flex-1 text-left">
+              {isStreaming ? 'Thinking...' : duration > 0 ? `Thought for ${duration}s` : 'Thoughts'}
+            </span>
+            <div className="ml-2 shrink-0">
+              {isStreaming ? (
+                <Loader2
+                  size={14}
+                  className="sm:size-4 animate-spin text-muted-foreground/50"
+                />
+              ) : (
+                <StatusIndicator icon={Check} iconClassName="text-green-500">
+                  <span className="hidden sm:inline text-xs">
+                    {`${content.reasoning.length.toLocaleString()} chars`}
+                  </span>
+                  <span className="inline sm:hidden text-xs">
+                    {`${Math.round(content.reasoning.length / 100) / 10}k`}
+                  </span>
+                </StatusIndicator>
+              )}
+            </div>
           </div>
         </ReasoningTrigger>
         <ReasoningContent>
-          <BotMessage
-            message={content.reasoning}
-            className="prose-p:text-muted-foreground text-xs sm:text-sm"
-          />
+          {content.reasoning}
         </ReasoningContent>
       </Reasoning>
     </div>

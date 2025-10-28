@@ -147,4 +147,51 @@
   .touch-manipulation {
     touch-action: manipulation;
   }
+
+  /* Responsive content handling */
+  .content-responsive {
+    max-width: 100%;
+    overflow-x: auto;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  /* Responsive reasoning container */
+  .reasoning-container {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  /* Responsive reasoning content */
+  .reasoning-content {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  /* Mobile-first responsive design */
+  @media (max-width: 768px) {
+    .mobile-responsive {
+      max-width: calc(100vw - 2rem);
+      overflow-x: auto;
+    }
+    
+    .sidebar-mobile {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    
+    .sidebar-mobile.open {
+      transform: translateX(0);
+    }
+  }
+
+  /* Ensure content doesn't break layout */
+  .break-anywhere {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
 }

@@ -33,21 +33,23 @@ export function DeepDiveToggle() {
       onPressedChange={handleDeepDiveModeChange}
       variant="outline"
       className={cn(
-        'gap-1 px-3 border border-input text-muted-foreground bg-background',
+        'gap-1.5 px-3 py-2 border border-input text-muted-foreground bg-background',
+        'min-h-[44px] min-w-[44px] touch-manipulation', // Better touch targets for mobile
         'data-[state=on]:bg-primary/10',
         'data-[state=on]:text-primary',
         'data-[state=on]:border-primary/30',
         'hover:bg-accent hover:text-accent-foreground rounded-full',
-        'transition-all duration-200'
+        'transition-all duration-200',
+        'text-sm md:text-xs' // Larger text on mobile
       )}
     >
       <Lightbulb
         className={cn(
-          'size-4 transition-transform duration-200',
+          'size-5 md:size-4 transition-transform duration-200', // Larger icon on mobile
           isDeepDiveMode && 'animate-pulse'
         )}
       />
-      <span className="text-xs">DeepDive</span>
+      <span className="text-sm md:text-xs font-medium">DeepDive</span>
     </Toggle>
   )
 }
